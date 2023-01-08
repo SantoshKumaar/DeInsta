@@ -9,7 +9,7 @@ import {
   getDocs,
   orderBy,
   serverTimestamp,
-  addDoc, 
+  addDoc,
   updateDoc,
   arrayUnion,
   arrayRemove
@@ -49,13 +49,15 @@ export const getUserDB = async (uid, data) => {
 
 export const addOrRemoveFollowers = async (followUid, yourUid, method) => { //method === add / remove
   try {
-    const you = (await getDoc(doc(db, "users", yourUid))).data();
-    const followUser = (await getDoc(doc(db, "users", followUid))).data();
-    updateDoc(doc(db, "users", you.uid), {
-      following: method === 'add' ? you.following + 1 : you.following - 1,
+    const youPromise = await getDoc(doc(db, "users", yourUid))
+    const you = youPromise.data();
+    const followPromise = await getDoc(doc(db, "users", followUid));
+    const followUser = followPromise.data();
+    updateDoc(doc(db, "users", you?.uid), {
+      following: method === 'add' ? you?.following + 1 : you?.following - 1,
     });
-    updateDoc(doc(db, "users", followUid.uid), {
-      followers: method === 'add' ? followUser.followers + 1 : followUser.followers - 1,
+    updateDoc(doc(db, "users", followUid?.uid), {
+      followers: method === 'add' ? followUser?.followers + 1 : followUser?.followers - 1,
     });
   } catch (error) {
     Alert.alert(error.code, error.message);
@@ -120,4 +122,3 @@ export const removePostLikes = async (postId, uid) => {
     Alert.alert(error.code, error.message);
   }
 };
-
