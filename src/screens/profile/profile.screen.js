@@ -1,19 +1,20 @@
 import React from "react";
 import { useState, useEffect } from "react";
-import { Button, StyleSheet, Dimensions, Text, View, Image } from "react-native";
+import { Button, StyleSheet, Dimensions, Text, View, Image, TouchableOpacity } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
 import { useSelector } from "react-redux";
 import SafeAreaContainer from "../../components/containers/SafeAreaContainer";
 import ProfilePic from "../../components/profilePic/ProfilePic";
 import { signOutUser } from "../../firebase/auth.firbase";
-import { getAllPosts } from "../../firebase/firestore.firebase";
+import { addOrRemoveFollowers, getAllPosts, getUserDB } from "../../firebase/firestore.firebase";
+import { useNavigation } from '@react-navigation/native';
 
-const HeaderSection = ({userData, isOwnProfile, posts}) => {
+const HeaderSection = ({userData, isOwnProfile, posts, onFollow}) => {
   return (
     <>
-      <View style={{ flexDirection: 'row', alignContent: 'center' }}>
+      <View style={{ flexDirection: 'row', alignContent: 'center', marginHorizontal: 16 }}>
         <ProfilePic
-          source={userData.profilePicUrl}
+          source={userData?.profilePicUrl}
           size={60}
           borderColor="#e75583"
         />
@@ -33,24 +34,30 @@ const HeaderSection = ({userData, isOwnProfile, posts}) => {
         </View>
       </View>
       <Text style={{ fontSize: 16, textTransform: "capitalize", marginBottom: 10, }}>
-        {userData.name}
+        {userData?.name}
       </Text>
-      {isOwnProfile ? <Button title="logout" onPress={signOutUser} /> : <Button title="Follow" onPress={() => null} />}
+      {isOwnProfile ? <Button title="logout" onPress={signOutUser} /> : <Button title="Follow" onPress={onFollow} />}
     </>
   );
 };
 
-const ProfileScreen = () => {
-  const user = null; //get selected user data here
-  const userData = user || useSelector((state) => state.user);
-  const isOwnProfile = !user;
+const ProfileScreen = ({route}) => {
+  const uid = route?.params?.uid || null;
+  const [user, setUser] = useState(null);
+  const [self, setSelf] = useState(useSelector((state) => state.user))
+  const isOwnProfile = !uid;
+  const userData = uid ? user : self;
   const deviceWidth = Dimensions.get("window").width;
   const [posts, setPosts] = useState([]);
+  const nav = useNavigation();
 
   useEffect(() => {
-    getAllPosts((data) => 
-      setPosts(data.filter((e => e.postData.uid === userData.uid))));
-  }, []);
+    if (uid) {
+      getUserDB(uid, setUser);
+    }
+    getAllPosts((data) =>
+      setPosts(data.filter((e => e.postData.uid === userData?.uid))));
+  }, [userData?.uid]);
 
   const renderPost = ({item, index}) => {
     return <Image
@@ -59,12 +66,14 @@ const ProfileScreen = () => {
     style={{ width: (deviceWidth - 34) / 3, height: (deviceWidth - 34) / 3, marginLeft: index % 3 ? 1 : 0, marginTop: 1}}
   />
   };
-  
+
+  const onFollow = () => {};
 
   return (
     <SafeAreaContainer style={styles.container}>
-      <HeaderSection userData={userData} isOwnProfile={isOwnProfile} posts={posts}/>
-      <FlatList 
+      {uid ? <TouchableOpacity style={{marginBottom: 10, backgroundColor: 'cyan'}} onPress={nav.goBack}><Text>Back</Text></TouchableOpacity> : null}
+      <HeaderSection userData={userData} isOwnProfile={isOwnProfile} posts={posts} onFollow={onFollow} />
+      <FlatList
         data={posts}
         contentContainerStyle={{marginTop: 5}}
         renderItem={renderPost}
@@ -79,7 +88,7 @@ export default ProfileScreen;
 
 const styles = StyleSheet.create({
   container : {
-    padding: 16,
+    margin: 16,
     flex: 1,
   }
 });

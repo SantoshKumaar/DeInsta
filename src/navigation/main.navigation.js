@@ -21,6 +21,7 @@ import { doc, getDoc } from "firebase/firestore";
 import { resetUser, setUser } from "../redux/slices";
 import { Alert } from "react-native";
 import { signOutUser } from "../firebase/auth.firbase";
+import ProfileScreen from "../screens/profile/profile.screen";
 
 const MainNavigation = () => {
   const [authLoaded, setAuthLoaded] = useState(false);
@@ -72,6 +73,7 @@ const MainNavigation = () => {
         >
           <Stack.Screen name="MainScreen" component={BottomTabNav} />
           <Stack.Screen name="StoryScreen" component={StoryScreen} />
+          <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
         </Stack.Navigator>
       )}
       <StatusBar style="auto" backgroundColor="white" />
