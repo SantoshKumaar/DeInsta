@@ -3,11 +3,17 @@ import { Image, StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import StyledText from "../StyledText";
 import { Entypo } from "@expo/vector-icons";
 import { useNavigation } from '@react-navigation/native';
+import { useSelector } from "react-redux";
 
 const FeedHeader = ({ data }) => {
   const nav = useNavigation();
+  const self = useSelector((state) => state.user);
   return (
-    <TouchableOpacity style={styles.feedHeader} onPress={() => nav.navigate('ProfileScreen', {uid: data.uid})}>
+    <TouchableOpacity style={styles.feedHeader} onPress={() => {
+      if (self.uid !== data.uid) {
+        nav.navigate('ProfileScreen', {uid: data.uid});
+      }
+      }}>
       <View style={styles.feedHeaderLeft}>
         <Image
           source={{ uri: data.profilePic }}

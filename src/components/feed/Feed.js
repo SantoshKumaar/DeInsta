@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Dimensions, Image, StyleSheet, Text, View } from "react-native";
+import { Dimensions, Image, StyleSheet, View } from "react-native";
 import { getUserDB } from "../../firebase/firestore.firebase";
 import FeedFooter from "./FeedFooter";
 import FeedHeader from "./FeedHeader";

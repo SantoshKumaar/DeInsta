@@ -54,11 +54,10 @@ const ProfileScreen = ({route}) => {
   useEffect(() => {
     if (uid) {
       getUserDB(uid, setUser);
-      console.log(user);
     }
     getAllPosts((data) =>
       setPosts(data.filter((e => e.postData.uid === userData?.uid))));
-  }, []);
+  }, [userData?.uid]);
 
   const renderPost = ({item, index}) => {
     return <Image
@@ -68,12 +67,7 @@ const ProfileScreen = ({route}) => {
   />
   };
 
-  if (uid === self?.uid) {
-    nav.goBack();
-  }
-
-  const onFollow = () =>
-    addOrRemoveFollowers(uid, self?.uid, 'add');
+  const onFollow = () => {};
 
   return (
     <SafeAreaContainer style={styles.container}>
